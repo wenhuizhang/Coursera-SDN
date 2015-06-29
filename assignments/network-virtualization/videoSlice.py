@@ -40,12 +40,34 @@ class VideoSlice (EventMixin):
         '''
 
         self.portmap = {
+	#h1----port 80----h3
                         ('00-00-00-00-00-01', EthAddr('00:00:00:00:00:01'),
                          EthAddr('00:00:00:00:00:03'), 80): '00-00-00-00-00-03',
 
                         """ Add your mapping logic here"""
+			
+			("00-00-00-00-00-03", EthAddr("00:00:00:00:00:01"),
+			 EthAddr("00:00:00:00:00:03"), 80): "00-00-00-00-00-04",
 
-                        }
+			("00-00-00-00-00-03", EthAddr("00:00:00:00:00:03"),
+                         EthAddr("00:00:00:00:00:01"), 80): "00-00-00-00-00-01",
+
+			("00-00-00-00-00-04", EthAddr("00:00:00:00:00:03"),
+                         EthAddr("00:00:00:00:00:01"), 80): "00-00-00-00-00-03",
+
+	#h2----port 22----h4
+			("00-00-00-00-00-01", EthAddr("00:00:00:00:00:02"),
+                         EthAddr("00:00:00:00:00:04"), 22): "00-00-00-00-00-02",
+
+			("00-00-00-00-00-02", EthAddr("00:00:00:00:00:02"),
+                         EthAddr("00:00:00:00:00:04"), 22): "00-00-00-00-00-04",
+			
+			("00-00-00-00-00-02", EthAddr("00:00:00:00:00:04"),
+                         EthAddr("00:00:00:00:00:02"), 22): "00-00-00-00-00-01",
+                        
+			("00-00-00-00-00-04", EthAddr("00:00:00:00:00:04"),
+                         EthAddr("00:00:00:00:00:02"), 22): "00-00-00-00-00-02",
+		       }
 
     def _handle_LinkEvent (self, event):
         l = event.link
@@ -88,9 +110,15 @@ class VideoSlice (EventMixin):
                           packet.dst, dpid_to_str(event.dpid), event.port)
 
                 try:
-                    """ Add your logic here"""
-
-
+			k = (this_dpid, packet.src, packet.dst, packet.find("tcp").dstport)
+			if not self.portmap.get(k):
+				k = (this_dpid, packet.src, pakcet.dst, packet.find("tcp").srcport)
+				if not self.portmap.get(k):
+					raise AttributeError
+			ndpid = self.portmap[k]
+			log.debug("install: %s output %d" % (str(k), self.adjacency[this_dpid][ndpid]))
+			install_fwdrule(event,packet,self.adjacency[this_dpid][ndpid])
+			
                 except AttributeError:
                     log.debug("packet type has no transport ports, flooding")
 
