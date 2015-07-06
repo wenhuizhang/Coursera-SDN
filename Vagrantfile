@@ -21,7 +21,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
  ## Guest Config
  config.vm.hostname = "coursera-sdn"
  config.vm.network :private_network, ip: "192.168.0.100"
- config.vm.network :forwarded_port, guest:6633, host:6635 # forwarding of port 
+ config.vm.network :forwarded_port, guest:6633, host:1234 # forwarding of port 
  
  ## Provisioning
  
