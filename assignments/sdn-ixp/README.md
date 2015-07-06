@@ -7,13 +7,17 @@
 <span class="c2">In this exercise, we’ll explore one implementation of a software defined Internet exchange point (SDX).  This implementation provides new programming abstractions allowing participants to create and run new wide area traffic delivery applications. SDX platform provides a scalable runtime that both, behaves correctly when interacting with BGP, and ensures that the applications do not interfere with each other.</span>
 
 ### <span class="c2 c26 c11 c48">Installation</span>
+To start this assignment update the course's Github repo (by default, Coursera-SDN) on your host machine using git pull. We updated the ```Vagrantfile``` to install all the required software to run the SDX assignment. Turn on your guest VM (if it is turned off) using vagrant up with provisioning. 
+```bash
+vagrant reload --provision
+```
 
-We updated the ```Vagrantfile``` to install all the required software to run the SDX assignment. In addition to ```Ryu```, it installs:
+The SDX setup script installs:
 * [Quagga](http://www.nongnu.org/quagga/)
 * [MiniNExT](https://github.com/USC-NSL/miniNExT.git)
 * [Exabgp](https://github.com/Exa-Networks/exabgp)
 
-SDX's setup file looks like this:
+SDX's setup script looks like this:
 ```bash
 #!/usr/bin/env bash
 
@@ -46,6 +50,7 @@ cd ~
 sudo pip install -U exabgp
 ```
 
+`Note`: We also had to re-provision the Mininet setup to make it work with ```MiniNExT```. Check the `Vagrantfile` to make sure that it has sdx and mininet setup uncommented.
 
 ### <a name="h.hefnxat1hpve"></a><span class="c48 c2 c26 c11">Walkthrough</span>
 
@@ -269,7 +274,7 @@ Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
 172.0.0.0       0.0.0.0         255.255.0.0     U     0      0        0 a1-eth0
 ```
 
-<span class="c2">Specifically, you should see two entries in A’s routing table for 140.0.0.0/8 and 150.0.0.0/8 whose next-hop IP address is 172.0.1.2.</span>
+<span class="c2">Specifically, you should see two entries in A’s routing table for 140.0.0.0/8 and 150.0.0.0/8 whose next-hop IP addresses are 172.0.1.3 & 172.0.01.4. These are the virtual next-hops for the two prefixes. You can find more details about the virtual next-hops from the section 4.2 of SDX's [SIGCOMM paper](http://www.cs.princeton.edu/~arpitg/pdfs/sigc056.pdf)</span>
 
 #### <a name="h.uxkh081ccb6a"></a><span class="c2 c6">Testing SDX Policies</span>
 
@@ -317,6 +322,9 @@ mininext> a1 iperf -c 140.0.0.1 -B 100.0.0.1 -p 4322 -t 2
 
 In case the `iperf` connection is not successful, you should see the message, `connect failed: Connection refused.`
 
+#### Cleaning Up
+Make sure that you clean up the ribs and clean the Mininet topology. For convenience, we have provided the ```clean.sh``` script. Run ```sudo sh clean.sh``` script to clean the ribs and the Mininet topology.
+
 ## <a name="h.dpp4i4pvtw7k"></a><span class="c48 c2 c26 c11">Assignment</span>
 
 <span class="c2">The setup for the assignment is similar to the previous example.  </span>
@@ -334,13 +342,12 @@ In case the `iperf` connection is not successful, you should see the message, `c
 
 <span class="c2">You will need to modify files in the example</span> <span class="c0">```simple```</span><span class="c2"> so that the behavior of the topology and forwarding is as we have have shown in the figure.  </span>
 
-<span class="c2">As with the walkthrough, the assignment has two parts.</span>
 
 #### <span class="c3 c2 c11">Part 1: Topology and route server configuration</span><span class="c3 c2">  
-</span><span class="c2">First, you will configure the topology as shown in the figure.  You will need two files:</span>
+</span><span class="c2">First, you will configure the topology as shown in the figure. You will need two files:</span>
 
 *   <span class="c0">```sdx_mininext.py```</span><span class="c2">: You will use this file to configure the SDX topology, as we have shown above. Similar to the walkthrough example, make sure that each router has a loopback address for each advertised route. For example, if the node</span> <span class="c0">c1</span><span class="c2"> advertises</span> <span class="c0">140.0.0.0/24</span> <span class="c2">then add the loopback interface</span> <span class="c0">140.0.0.1</span><span class="c2"> for</span> <span class="c0">c1</span><span class="c2">.  </span>
-*   <span class="c0">```bgpd.conf```</span><span class="c2">: You will use this file to set up the BGP sessions for each of the participants and change the IP prefixes that each participant advertises. For example if node</span> <span class="c0">c1</span><span class="c2"> advertises</span> <span class="c0">140.0.0.0/24,</span> <span class="c2">then make sure that</span> <span class="c2">network</span><span class="c9 c2"> </span><span class="c0">140.0.0.0/24</span><span class="c9 c2"> </span><span class="c2">is added in</span><span class="c9 c2"> c1’s bgpd.conf</span> <span class="c2">file.</span><span class="c9 c2"> </span>
+*   <span class="c0">```bgpd.conf```</span><span class="c2">: You will use this file to set up the BGP sessions for `each` participant and change the IP prefixes that they advertise. For example if node</span> <span class="c0">c1</span><span class="c2"> advertises</span> <span class="c0">140.0.0.0/24,</span> <span class="c2">then make sure that</span> <span class="c2">network</span><span class="c9 c2"> </span><span class="c0">140.0.0.0/24</span><span class="c9 c2"> </span><span class="c2">is added in</span><span class="c9 c2"> c1’s bgpd.conf</span> <span class="c2">file.</span><span class="c9 c2"> </span>
 
 ##### <span class="c3 c2 c11">Testing the topology and route server configuration</span>
 
@@ -352,25 +359,27 @@ mininext> a1 route -n
 Kernel IP routing table
 Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
 140.0.0.0       172.0.1.3       255.255.255.0   UG    0      0        0 a1-eth0
-150.0.0.0       172.0.1.3       255.255.255.0   UG    0      0        0 a1-eth0
-160.0.0.0       172.0.1.2       255.255.255.0   UG    0      0        0 a1-eth0
-170.0.0.0       172.0.1.2       255.255.255.0   UG    0      0        0 a1-eth0
+150.0.0.0       172.0.1.6       255.255.255.0   UG    0      0        0 a1-eth0
+160.0.0.0       172.0.1.7       255.255.255.0   UG    0      0        0 a1-eth0
+170.0.0.0       172.0.1.8       255.255.255.0   UG    0      0        0 a1-eth0
 172.0.0.0       0.0.0.0         255.255.0.0     U     0      0        0 a1-eth0
-180.0.0.0       172.0.1.4       255.255.255.0   UG    0      0        0 a1-eth0
+180.0.0.0       172.0.1.5       255.255.255.0   UG    0      0        0 a1-eth0
 190.0.0.0       172.0.1.4       255.255.255.0   UG    0      0        0 a1-eth0
 ```
 
 #### <span class="c3 c2 c11">Part 2: Policy configuration</span><span class="c2 c3">  
 </span><span class="c2">In the second part, you will define policies for each participant. These policies should satisfy the following goals:</span>
 
-*   <span class="c2">Participant A should forward HTTP traffic to peer B, HTTPS and port 8080 traffic to C.</span>
-*   <span class="c2">Participant C should forward HTTPS traffic to c1, HTTP traffic to c2 and drop any traffic for port 8080.</span><sup>[[h]](#cmnt8)</sup>
+*   <span class="c2">Participant A should forward HTTP traffic to peer B, HTTPS traffic to C.</span>
+*   <span class="c2">Participant C should forward HTTPS traffic to c1, HTTP traffic to c2. 
 
-<span class="c2">You will need to modify</span> <span class="c0">participant_A.py</span><span class="c2"> and</span> <span class="c0">participant_C.py</span><span class="c2"> from the walkthrough to implement these policies.</span>
+<span class="c2">You will need to modify</span> <span class="c0">participant_1.py</span><span class="c2"> and</span> <span class="c0">participant_3.py</span><span class="c2"> from the walkthrough to implement these policies.</span>
 
 ##### <span class="c3 c2 c11">Testing policy configuration</span>
 
-<span class="c2">SDX’s route server will select B’s routes for the prefixes</span> <span class="c0">140.0.0.0/24</span><span class="c0">,</span> <span class="c0">150.0.0.0/24</span><span class="c0">,</span> <span class="c0">160.0.0.0/24</span><span class="c0"> &</span> <span class="c0">180.0.0.0/24</span><span class="c0">;</span> <span class="c2">C’s routes for the prefixes</span><span class="c0"> </span><span class="c0">180.0.0.0/24</span><span class="c0"> &</span> <span class="c0">190.0.0.0/24</span><span class="c0">; and</span> <span class="c2">A’s routes for the prefixes</span><span class="c0"> </span><span class="c0">100.0.0.0/24</span><span class="c0"> &</span> <span class="c0">110.0.0.0/24</span><span class="c0">.</span> <span class="c2">Even though A’s policy is to forward port 80 traffic to B, the SDX controller will forward port 80 traffic with dstip = 180.0.0.1 to C. Since C’s inbound TE policy forwards the HTTP traffic to c2, thus this traffic should be received at c2\. Similarly HTTPS traffic from A should be received at c1\. We should also expect packet drops for port 8080 traffic forwarded to C.</span>
+<span class="c2">SDX’s route server will select B’s routes for the prefixes</span> <span class="c0">140.0.0.0/24</span><span class="c0">,</span> <span class="c0">150.0.0.0/24</span><span class="c0">,</span> <span class="c0">160.0.0.0/24</span><span class="c0"> &</span> <span class="c0">170.0.0.0/24</span><span class="c0">;</span> <span class="c2">C’s routes for the prefixes</span><span class="c0"> </span><span class="c0">180.0.0.0/24</span><span class="c0"> &</span> <span class="c0">190.0.0.0/24</span><span class="c0">; and</span> <span class="c2">A’s routes for the prefixes</span><span class="c0"> </span><span class="c0">100.0.0.0/24</span><span class="c0"> &</span> <span class="c0">110.0.0.0/24</span><span class="c0">.
+
+</span> <span class="c2">Even though A’s policy is to forward port 80 traffic to B, the SDX controller will forward port 80 traffic with dstip = 180.0.0.1 to C (because participant B didn't advertise the route for the prefix 180.0.0.0/24). Since C’s inbound TE policy forwards the HTTP traffic to c2, thus this traffic should be received at c2\. Similarly HTTPS traffic from A should be received at c1\. 
 
 <span class="c2">Similar to the walkthrough example, you can use iperf to test the policy configuration. You can verify that port 80 traffic for routes advertised by B will be received by node b1.</span>
 ```bash
@@ -386,7 +395,7 @@ TCP window size: 85.3 KByte (default)
 [  3]  0.0- 3.0 sec   384 KBytes  1.06 Mbits/sec
 ```
 
-<span class="c2">You can verify that port 80 traffic from A for routes advertised only by C will be forwarded to node c1\.</span>
+<span class="c2">You can also verify that port 80 traffic from A for routes advertised only by C will be forwarded to node c1\.</span>
 ```bash
 mininext> c2 iperf -s -B 180.0.0.1 -p 80 &
 mininext> a1 iperf -c 180.0.0.1 -B 100.0.0.2 -p 80 -t 2
@@ -400,24 +409,14 @@ TCP window size: 85.3 KByte (default)
 [  3]  0.0- 3.0 sec   384 KBytes  1.04 Mbits/sec
 ```
 
-<span class="c2">Finally, you</span><span class="c2"> can also verify that the port 8080 traffic forwarded to C</span><span class="c2"> will be dropped.</span>
-
-```bash
-mininext> c1 iperf -s -B 180.0.0.1 -p 8080 &
-mininext> a1 iperf -c 180.0.0.1 -B 100.0.0.1 -p 8080 -t 2
-```
-
-<span class="c0 c10">Nothing happens, use ctrl+c to end this test</span>
-
-<span class="c2">In this case you should see iperf client’s requests from A will not be received by the server running on c1\.</span><span class="c0">  
-</span>
-
 ### <a name="h.43cd3gtc620p"></a><span class="c48 c2 c26">Submitting the Assignment</span>
+
+**NOTE** The submit.py script will start all applications required by the sdx assignment (MiniNExT, set OF 1.3, start Ryu, start route server and ExaBGP). To make sure the enviroment is clean, close all other windows but one and clean the enviroment with the provided script and only then submit.
 
 <span class="c2">Copy the</span> <span class="c0">submit.py</span><span class="c2"> file that we have provided to the</span> <span class="c0">~/sdx-ryu/</span><span class="c0">examples/simple/mininet/</span><span class="c2"> directory.</span> Now run the ```submit.py``` script from the ```~/sdx-ryu/examples/simple/mininet/``` directory.
 
 ```bash
-$ sudo submit.py  
+$ sudo python submit.py  
 ```
 
 <span class="c2">Your mininet VM should have Internet access by default, but still verify that it has internet connectivity (i.e., eth0 set up as NAT). Otherwise, ```submit.py``` will not be able to post your code and output to our coursera servers.</span>
