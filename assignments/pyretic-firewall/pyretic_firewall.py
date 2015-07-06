@@ -53,7 +53,7 @@ def main():
     not_allowed = none
     # and add traffic that isn't allowed
     for row in reader:
-        not_allowed = not_allowed + match(srcmac=MAC(row['mac_0']), dstmac=MAC(row['mac_1'])) + match(srcmac=MAC(row['mac_1']), dstmac=MAC(row['mac_0']))
+        not_allowed = not_allowed | match(srcmac=MAC(row['mac_0']), dstmac=MAC(row['mac_1'])) | match(srcmac=MAC(row['mac_1']), dstmac=MAC(row['mac_0']))
     # express allowed traffic in terms of not_allowed - hint use '~'
     allowed = ~not_allowed
 
