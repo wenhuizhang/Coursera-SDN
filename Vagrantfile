@@ -32,6 +32,12 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
  config.vm.provision :shell, privileged: false, :path => "setup/p4-setup.sh"
  config.vm.provision :shell, privileged: false, :path => "setup/netasm-setup.sh"
  #config.vm.provision :shell, privileged: false, :path => "setup/sdx-setup.sh"
+ #config.vm.provision :shell, privileged: false, :path => "setup/ryu-setup.sh"
+ #config.vm.provision :shell, privileged: false, :path => "setup/p4-setup.sh"
+ #config.vm.provision :shell, privileged: false, :path => "setup/netasm-setup.sh"
+ config.vm.provision :shell, privileged: false, :path => "setup/mininet-setup.sh"
+ config.vm.provision :shell, privileged: false, :path => "setup/sdx-setup.sh"
+
  #config.vm.provision :shell, privileged: false, :path => "setup/kinetic-setup.sh"
 
  ## SSH config

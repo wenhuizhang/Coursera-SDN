@@ -45,8 +45,7 @@ import csv, os
 policy_file = "%s/pyretic/pyretic/examples/firewall-policies.csv" % os.environ[ 'HOME' ]
 
 def main():
-    # Copy the code you used to read firewall-policies.csv last week
-    
+    # Copy the code you used to read firewall-policies.csv last week    
     # start with a policy that doesn't match any packets
     not_allowed = none
     # and add traffic that isn't allowed
@@ -54,6 +53,7 @@ def main():
         reader = csv.DictReader(f)
         for row in reader:
             not_allowed = not_allowed | match(srcmac=MAC(row['mac_0']), dstmac=MAC(row['mac_1'])) | match(srcmac=MAC(row['mac_1']), dstmac=MAC(row['mac_0']))
+
     # express allowed traffic in terms of not_allowed - hint use '~'
     allowed = ~not_allowed
 

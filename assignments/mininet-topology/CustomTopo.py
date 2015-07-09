@@ -1,9 +1,12 @@
-#!/usr/bin/python
+
 '''
 Coursera:
 - Software Defined Networking (SDN) course
 -- Programming Assignment 2
+<<<<<<< HEAD
 
+=======
+>>>>>>> HW#7
 Professor: Nick Feamster
 Teaching Assistant: Arpit Gupta, Muhammad Shahbaz
 '''
@@ -24,11 +27,15 @@ from mininet.link import TCLink
 
     "linkopts - (1:core, 2:aggregation, 3: edge) parameters"
     "fanout - number of child switch per parent switch"
+
     
+    
+
+
     # NOTE: logic has to support setting at least bw and delay parameters for
     # each link.
     
-    def __init__(self, linkopts1={}, linkopts2={}, linkopts3={}, fanout=2, **opts):
+    #def __init__(self, linkopts1={}, linkopts2={}, linkopts3={}, fanout=2, **opts):
 
 class CustomTopo(Topo):
 	'''
@@ -38,7 +45,9 @@ class CustomTopo(Topo):
 	'''
 	def __init__(self, linkopts1, linkopts2, linkopts3, fanout=2, **opts):
 
-        # Initialize topology and default options
+
+         # Initialize topology and default options
+
 		Topo.__init__(self, **opts)
         
 
@@ -104,7 +113,6 @@ if __name__ == '__main__':
 
 #topos = { 'custom': ( lambda: CustomTopo() ) }
 
-
 		# params init
 		self.linkopts1 = linkopts1
 		self.linkopts2 = linkopts2
@@ -169,3 +177,4 @@ if __name__ == '__main__':
 
 
 #topos = { 'custom': ( lambda: CustomTopo() ) }
+
