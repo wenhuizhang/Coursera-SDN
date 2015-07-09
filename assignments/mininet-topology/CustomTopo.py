@@ -13,7 +13,6 @@ from mininet.link import TCLink
 from mininet.log import setLogLevel
 from mininet.net import Mininet
 from mininet.cli import CLI
-
 from mininet.net import Mininet
 from mininet.util import irange, dumpNodeConnections
 from mininet.link import TCLink 
@@ -23,10 +22,11 @@ from mininet.link import TCLink
     "linkopts - (1:core, 2:aggregation, 3: edge) parameters"
     "fanout - number of child switch per parent switch"
 
+
     # NOTE: logic has to support setting at least bw and delay parameters for
     # each link.
     
-    def __init__(self, linkopts1={}, linkopts2={}, linkopts3={}, fanout=2, **opts):
+    #def __init__(self, linkopts1={}, linkopts2={}, linkopts3={}, fanout=2, **opts):
 
 class CustomTopo(Topo):
 	'''
@@ -37,13 +37,12 @@ class CustomTopo(Topo):
 	def __init__(self, linkopts1, linkopts2, linkopts3, fanout=2, **opts):
 
 
-    def __init__(self, linkopts1, linkopts2, linkopts3, fanout=2, **opts):
-
-        # Initialize topology and default options
+         # Initialize topology and default options
 		Topo.__init__(self, **opts)
         
 
         # Add your logic here ...
+
 
 
 		# params init
