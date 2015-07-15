@@ -45,10 +45,6 @@ class VideoSlice (EventMixin):
                          EthAddr('00:00:00:00:00:03'), 80): '00-00-00-00-00-03',
 
                         # Add your mapping logic here
-
-                        }
-
-                        """ Add your mapping logic here"""
 			
 			("00-00-00-00-00-03", EthAddr("00:00:00:00:00:01"),
 			 EthAddr("00:00:00:00:00:03"), 80): "00-00-00-00-00-04",
@@ -116,7 +112,7 @@ class VideoSlice (EventMixin):
                 try:
 			k = (this_dpid, packet.src, packet.dst, packet.find("tcp").dstport)
 			if not self.portmap.get(k):
-				k = (this_dpid, packet.src, pakcet.dst, packet.find("tcp").srcport)
+				k = (this_dpid, packet.src, packet.dst, packet.find("tcp").srcport)
 				if not self.portmap.get(k):
 					raise AttributeError
 			ndpid = self.portmap[k]

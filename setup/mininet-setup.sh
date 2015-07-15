@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 
 
-git clone git://github.com/mininet/mininet
-mininet/util/install.sh -fn03
 
 # We have to downgrade Mininet's version to 2.1.0p2 for the SDX Assignment
 # This sucks but we have to ensure compatibility between 

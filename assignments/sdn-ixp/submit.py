@@ -219,7 +219,6 @@ def output(partIdx):
             	n_routes = len(routingDump.split('a1-eth0'))-1
     		# Make sure that your routing table has 7 entries
 
-    		
     		if n_routes == 7:
     			outputString += routingDump
     			break
@@ -229,17 +228,13 @@ def output(partIdx):
 
     	print "Staring Iperf Server ..."
     	b1.cmdPrint('iperf -s -B 140.0.0.1 -p 80 &')
-
     	c2.cmdPrint('iperf -s -B 180.0.0.1 -p 80 &')
-
 
     	'Wait for some time ...'
     	time.sleep(5)
 
     	print "Starting Iperf Client ..."
     	outputString += a1.cmd('iperf -c 140.0.0.1 -B 100.0.0.1 -p 80 -t 2')
-
-    	
 
     	print " Completed Iperf Experiment."
     	net.stop()
@@ -251,5 +246,4 @@ def output(partIdx):
     return outputString.strip()
 
 #output(0)
-
 submit()
