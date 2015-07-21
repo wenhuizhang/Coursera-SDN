@@ -42,6 +42,7 @@ from csv import DictReader
 log = core.getLogger()
 policyFile = "%s/pox/pox/misc/firewall-policies.csv" % os.environ[ 'HOME' ]
 
+
 ''' Add your global variables here ... '''
 Policy = namedtuple('Policy', ('dl_src', 'dl_dst'))
 
