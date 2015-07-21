@@ -34,6 +34,7 @@ class gardenwall(DynamicPolicy):
     def __init__(self):
 
         #rewriteDstIPAndMAC
+        #could import the rewrite.py instead of copying the functions here
         def rewriteDstIPAndMAC(client_ips, garden_ip_str):
             garden_mac = MAC('00:00:00:00:00:03')
             garden_ip = IP(garden_ip_str)
