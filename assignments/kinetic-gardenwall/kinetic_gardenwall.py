@@ -1,11 +1,3 @@
-'''
-Coursera:
-- Software Defined Networking (SDN) course
--- Module 8 Programming Assignment
-
-Professor: Nick Feamster
-Teaching Assistant: Arpit Gupta
-'''
 
 from pyretic.lib.corelib import *
 from pyretic.lib.std import *
@@ -15,9 +7,9 @@ from pyretic.kinetic.drivers.json_event import JSONEvent
 from pyretic.kinetic.smv.model_checker import *
 from pyretic.kinetic.util.rewriting import *
 from pyretic.kinetic.apps.mac_learner import *
+import os
 
 #####################################################################################################
-# Author: Hyojoon Kim
 # * App launch
 #   - pyretic.py pyretic.kinetic.apps.gardenwall
 #
@@ -41,6 +33,14 @@ from pyretic.kinetic.apps.mac_learner import *
 class gardenwall(DynamicPolicy):
     def __init__(self):
 
+        #rewriteDstIPAndMAC
+        def rewriteDstIPAndMAC(client_ips, garden_ip_str):
+            garden_mac = MAC('00:00:00:00:00:03')
+            garden_ip = IP(garden_ip_str)
+            match_ip = union([match(dstip=client_ips[0]), match(dstip=client_ips[1])])
+            change_ip = modify(dstip=garden_ip)
+            change_mac = modify(dstmac=garden_mac)
+            return match_ip >> change_ip >> change_mac
         # Garden Wall
         def redirectToGardenWall():
             client_ips = [IP('10.0.0.1'), IP('10.0.0.2')]
@@ -50,8 +50,7 @@ class gardenwall(DynamicPolicy):
         ### DEFINE THE LPEC FUNCTION
 
         def lpec(f):
-            # Your logic here
-            # return match =
+            return match(srcip=f['srcip'])
 
         ## SET UP TRANSITION FUNCTIONS
 
@@ -67,11 +66,10 @@ class gardenwall(DynamicPolicy):
         def policy(self):
             # If exempt, redirect to gardenwall. 
             #  - rewrite dstip to 10.0.0.3
-            self.case(test_and_true(V('exempt'),V('infected')), C(redirectToGardenWall()))
+            self.case(test_and_true(V('exempt'), V('infected')),C(redirectToGardenWall()))
 
             # If infected, drop
-            # Your logic here
-            # self.case ()
+            self.case(is_true(V('infected')) ,C(drop))
 
             # Else, identity    
             self.default(C(identity))
@@ -83,10 +81,12 @@ class gardenwall(DynamicPolicy):
             infected=FSMVar(type=BoolType(), 
                             init=False, 
                             trans=infected),
-            # Your logic here
-            # exempt =
-            # policy =
-            )
+            exempt=FSMVar(type=BoolType(), 
+                            init=False, 
+                            trans=exempt),
+            policy=FSMVar(type=Type(Policy,{redirectToGardenWall(),drop,identity}),
+                          init=identity,
+                          trans=policy))
 
         ### SET UP POLICY AND EVENT STREAMS
 
