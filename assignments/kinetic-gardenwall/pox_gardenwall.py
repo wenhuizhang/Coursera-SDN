@@ -71,20 +71,16 @@ class Firewall (EventMixin):
         
         # Forward to gardenwall if both True.
         if infected_state == 'True' and exempt_state == 'True':
-            # self.clear_pass()
             self.clear_block(flow)
             self.install_garden(flow)
 
         # Else if infected is True, drop.
-        if infected_state == 'True' and exempt_state == 'False':
-            # self.clear_pass()
-            # self.clear_garden()
+        elif infected_state == 'True' and exempt_state == 'False':
             self.clear_block(flow)
             self.install_block(flow)
 
         # Else allow by default (check clear_block(flow))
-        if infected_state == 'False':
-            # self.clear_garden()
+        else infected_state == 'False':
             self.clear_block(flow)
             self.clear_garden(flow)
             self.install_pass(flow)
