@@ -21,7 +21,7 @@ To get started install these softwares on your host machine:
 
 * Clone the course repository from Github:
 ```bash 
-$ git clone https://github.com/PrincetonUniversity/Coursera-SDN
+$ git clone https://github.com/wenhuizhang/Coursera-SDN.git
 ```
 
 * Change the directory to Coursera-SDN:
